@@ -10,6 +10,7 @@
             .table-sm th, .table-sm td { padding-left: 0.8rem; padding-right: 0.8rem; }
             kbd { margin-right: 0.1rem; }
             .popover { max-width: 100%; }
+            #chatroom { max-height: 12.5rem; overflow-y: scroll; }
         </style>
 
         <script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
@@ -49,7 +50,7 @@
                             </div>
                         </li>
                     </ul>
-                    <ul class="list-group">
+                    <ul class="list-group mb-3">
                         <li class="list-group-item"><strong>Remote Connections</strong></li>
                         <li class="list-group-item list-group-item-secondary" v-for="connection in rosterList">
                             <span v-bind:class="connectionCodeNameStyle(connection)">{{ connection.codename }}</span>
@@ -60,6 +61,23 @@
                             <input type="text" class="form-control" placeholder="CodeName" v-model="codename" v-on:keyup.enter="connect">
                             <div class="input-group-append">
                                 <button class="btn btn-secondary btn-outline-light" type="button" v-on:click="connect">Connect!</button>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Chatroom</strong></li>
+                        <li class="list-group-item list-group-item-secondary">
+                            <div ref="chatroom" id="chatroom" class="pr-3">
+                                <div v-for="message in chatroom" class="rounded mb-2 p-2" v-bind:class="messageStyle(message)">
+                                    <div class="small font-weight-bold mb-1">{{ message.author }}</div>
+                                    <div>{{ message.msg }}</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center input-group">
+                            <input type="text" class="form-control" placeholder="Message" v-model="message" v-on:keyup.enter="sendChatMessage">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary btn-outline-light" type="button" v-on:click="sendChatMessage">Send!</button>
                             </div>
                         </li>
                     </ul>
@@ -103,7 +121,7 @@
         <script src="papaya.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-        <script src="https://radiogra.ph/rtcpacs/rtcpacs.js"></script>
+        <script src="rtcpacs.js"></script>
         <script>
             var papayaConfig = {
                  showOrientation: true,
