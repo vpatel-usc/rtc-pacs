@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        
+
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/darkly/bootstrap.min.css">
         <link rel="stylesheet" href="papaya.css" />
         <style>
@@ -15,7 +15,33 @@
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.3.1/peerjs.min.js "></script>
+        <script>
+            const indications = [
+                null,
+                'trauma',
+                'headache',
+                'AMS',
+                'AMS',
+                'headache'
+            ];
+            const numCases = indications.length - 1;
 
+            var papayaConfig = {
+                 showOrientation: true,
+                 radiological: true,
+                 kioskMode: true,
+                 showControls: false,
+                 ignoreNiftiTransforms: true,
+                 worldSpace: false,
+                 loadingComplete: function() {
+                     papaya.viewer.Viewer.CROSSHAIRS_COLOR = "rgba(239, 41, 41, 255)";
+                     papaya.viewer.Viewer.CROSSHAIRS_SIZE = 0.02;
+                 }
+            };
+            for (let i = 1; i <= numCases; ++i) {
+                papayaConfig[`rtc-case-${i}.nii.gz`] = {min: -20, max: 140};
+            }
+        </script>
         <title>RTC PACS</title>
     </head>
     <body class="pt-5">
@@ -32,7 +58,7 @@
                         </div>
                         <select class="custom-select" id="caseSelect" v-model="caseSelect" v-bind:disabled="!controlToggle">
                             <option name="rtc-case-null.nii.gz" disabled value="">Choose a case...</option>
-                            <option v-for="n in 2" v-bind:value="`cases/rtc-case-${n}.nii.gz`" v-bind:name="`rtc-case-${n}.nii.gz`">Case {{n}}</option>
+                            <option v-for="n in numCases" v-bind:value="`cases/rtc-case-${n}.nii.gz`" v-bind:name="`rtc-case-${n}.nii.gz`">Case {{n}}: {{indications[n]}}</option>
                         </select>
                     </div>
                     <div class="papaya" data-params="papayaConfig" id="papaya" v-bind:style="{ pointerEvents: (controlToggle) ? 'auto' : 'none' }"></div>
@@ -122,19 +148,8 @@
         <script src="papaya.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <script src="https://radiogra.ph/rtcpacs/rtcpacs.js"></script>
+        <script src="rtcpacs.js"></script>
         <script>
-            var papayaConfig = {
-                 showOrientation: true,
-                 radiological: true,
-                 kioskMode: true,
-                 showControls: false,
-                 loadingComplete: function() {
-                     papaya.viewer.Viewer.CROSSHAIRS_COLOR = "rgba(239, 41, 41, 255)";
-                     papaya.viewer.Viewer.CROSSHAIRS_SIZE = 0.02;
-                 }
-            };
-
             $('#instructionsLink').popover({
                 trigger: 'hover',
                 placement: 'left',
