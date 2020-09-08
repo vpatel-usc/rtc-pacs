@@ -84,12 +84,10 @@ class RtcPacs {
             RtcPacs.handleError(err);
             RtcPacs.handleError('Microphone permission denied.  This is not going to work.  Look for an icon in the URL bar, grant mic access and reload the page.');
         });
-        
+
         // Vars for testing
         this.t1 = 0;
         this.t2 = 0;
-        this.t3 = 0;
-        this.t4 = 0;
     }
 
     // Peer Event Listeners
@@ -414,12 +412,28 @@ class RtcPacs {
 
     testScrollF(ts) {
         let N = 35;
-        if (this.t1 < N*5) {
+        if (this.t1 < N*10) {
                 papayaContainers[0].viewer.currentCoord.z = this.t1 % N;
                 papayaContainers[0].viewer.drawViewer(true);
                 this.broadcastViewer();
                 this.t1++;
                 window.requestAnimationFrame(this.testScrollF.bind(this));
+        } else {
+            this.t1 = 0;
+        }
+    }
+
+    testJumpF() {
+        let N = 35;
+        let m = 4;
+        if (this.t2 < m*100) {
+                papayaContainers[0].viewer.currentCoord.z = this.t2 % N;
+                papayaContainers[0].viewer.drawViewer(true);
+                this.broadcastViewer();
+                this.t2 += m;
+                window.setTimeout(this.testScrollF.bind(this), 500);
+        } else {
+            this.t2 = 0;
         }
     }
 }
@@ -505,6 +519,7 @@ var vm = new Vue({
             this.$data.testScrollF();
         },
         testJump: function() {
+            this.$data.testJumpF();
         }
     },
     watch: {
