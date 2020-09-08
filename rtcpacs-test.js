@@ -413,10 +413,11 @@ class RtcPacs {
     }
 
     testScrollF(ts) {
+        let N = 35;
         if (this.t1 < N*5) {
                 papayaContainers[0].viewer.currentCoord.z = this.t1 % N;
                 papayaContainers[0].viewer.drawViewer(true);
-                this.$data.broadcastViewer();
+                this.broadcastViewer();
                 this.t1++;
                 window.requestAnimationFrame(this.testScrollF.bind(this));
         }
@@ -501,7 +502,7 @@ var vm = new Vue({
             }
         },
         testScroll: function() {
-            window.requestAnimationFrame(this.$data.testScrollF);
+            window.requestAnimationFrame(this.$data.testScrollF.bind(this));
         },
         testJump: function() {
         }
