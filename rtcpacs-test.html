@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/darkly/bootstrap.min.css">
+        <link rel="stylesheet" href="papaya.css" />
+        <style>
+            .table-sm th, .table-sm td { padding-left: 0.8rem; padding-right: 0.8rem; }
+            kbd { margin-right: 0.1rem; }
+            .popover { max-width: 100%; }
+            #chatroom { max-height: 12.5rem; overflow-y: scroll; }
+            #mic { cursor: pointer; }
+        </style>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.3.1/peerjs.min.js "></script>
+        <script>
+            const indications = [
+                null,
+                'trauma',
+                'headache',
+                'AMS',
+                'AMS',
+                'headache'
+            ];
+            const numCases = indications.length - 1;
+
+            var papayaConfig = {
+                 showOrientation: true,
+                 radiological: true,
+                 kioskMode: true,
+                 showControls: false,
+                 ignoreNiftiTransforms: true,
+                 worldSpace: false,
+                 loadingComplete: function() {
+                     papaya.viewer.Viewer.CROSSHAIRS_COLOR = "rgba(239, 41, 41, 255)";
+                     papaya.viewer.Viewer.CROSSHAIRS_SIZE = 0.02;
+                 }
+            };
+            for (let i = 1; i <= numCases; ++i) {
+                papayaConfig[`rtc-case-${i}.nii.gz`] = {min: -20, max: 140};
+            }
+        </script>
+        <title>Test Remote Viewer (WebRTC)</title>
+    </head>
+    <body class="pt-5">
+        <div class="container-fluid" id="app">
+            <nav class="navbar fixed-top navbar-dark bg-dark">
+                <span class="navbar-brand mb-0 h1">WebRTC Connection</span>
+                <span class="alert alert-primary my-0">This site <strong>requires</strong> microphone access. Need <a target="_blank" href="https://support.google.com/chrome/answer/2693767">help</a>?</span>
+            </nav>
+            <div class="row mt-5">
+                <div class="col-9">
+                    <div class="input-group mb-3 px-2">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="caseSelect">Worklist</label>
+                        </div>
+                        <select class="custom-select" id="caseSelect" v-model="caseSelect" v-bind:disabled="!controlToggle">
+                            <option name="rtc-case-null.nii.gz" disabled value="">Choose a case...</option>
+                            <option v-for="n in numCases" v-bind:value="`cases/rtc-case-${n}.nii.gz`" v-bind:name="`rtc-case-${n}.nii.gz`">Case {{n}}: {{indications[n]}}</option>
+                        </select>
+                    </div>
+                    <div class="papaya" data-params="papayaConfig" id="papaya" v-bind:style="{ pointerEvents: (controlToggle) ? 'auto' : 'none' }"></div>
+                </div>
+                <div class="col">
+                    <div class="text-center mb-1">
+                        <button class="btn btn-sm btn-info" v-on:click="testScroll">scroll</button>
+                        <button class="btn btn-sm btn-success" v-on:click="testJump">jump</button>
+                    </div>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item"><strong>My Status</strong></li>
+                        <li class="list-group-item list-group-item-secondary">
+                            <span v-bind:class="peerCodeNameStyle">{{ peerCodeName }}</span>
+                            <span id="mic" class="ml-2">
+                                <svg v-on:click="audioStatusToggle" v-if="microphoneState == RtcPacs.microphoneStates.unmuted" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-mic-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <title>mic on</title>
+                                    <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z"/>
+                                    <path fill-rule="evenodd" d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
+                                </svg>
+                                <svg v-on:click="audioStatusToggle" v-if="microphoneState == RtcPacs.microphoneStates.muted" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-mic-mute-fill text-danger" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <title>muted</title>
+                                    <path fill-rule="evenodd" d="M12.734 9.613A4.995 4.995 0 0 0 13 8V7a.5.5 0 0 0-1 0v1c0 .274-.027.54-.08.799l.814.814zm-2.522 1.72A4 4 0 0 1 4 8V7a.5.5 0 0 0-1 0v1a5 5 0 0 0 4.5 4.975V15h-3a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-3v-2.025a4.973 4.973 0 0 0 2.43-.923l-.718-.719zM11 7.88V3a3 3 0 0 0-5.842-.963L11 7.879zM5 6.12l4.486 4.486A3 3 0 0 1 5 8V6.121zm8.646 7.234l-12-12 .708-.708 12 12-.708.707z"/>
+                                </svg>
+                            </span>
+                            <span class="float-right badge" v-bind:class="peerBadgeStyle">{{ peerBadgeText }}</span>
+                        </li>
+                        <li class="list-group-item list-group-item-secondary">
+                            <div class="custom-control custom-switch text-center">
+                                <input type="checkbox" class="custom-control-input" id="controlToggle" v-model="controlToggle" v-on:change="changeControl">
+                                <label class="custom-control-label" for="controlToggle"><abbr id="instructionsLink" data-toggle="popover">Control</abbr> the viewer</label>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item"><strong>Remote Connections</strong></li>
+                        <li class="list-group-item list-group-item-secondary" v-for="connection in rosterList">
+                            <span v-bind:class="connectionCodeNameStyle(connection)">{{ connection.codename }}</span>
+                            <span class="float-right badge ml-1" v-bind:class="connectionBadgeStyle(connection, 'audio')">audio</span>
+                            <span class="float-right badge" v-bind:class="connectionBadgeStyle(connection, 'data')">data</span>
+                        </li>
+                        <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center input-group">
+                            <input type="text" class="form-control" placeholder="CodeName" v-model="codename" v-on:keyup.enter="connect">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary btn-outline-light" type="button" v-on:click="connect">Connect!</button>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Chat Room</strong></li>
+                        <li class="list-group-item list-group-item-secondary">
+                            <div ref="chatroom" id="chatroom" class="pr-3">
+                                <div v-for="message in chatroom" class="rounded mb-2 p-2" v-bind:class="messageStyle(message)">
+                                    <div class="small font-weight-bold mb-1">{{ message.author }}</div>
+                                    <div>{{ message.msg }}</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center input-group">
+                            <input type="text" class="form-control" placeholder="Message" v-model="message" v-on:keyup.enter="sendChatMessage">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary btn-outline-light" type="button" v-on:click="sendChatMessage">Send!</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row mt-3 px-2 d-none">
+                <div class="col-9">
+                    <table id="instructions" class="table table-sm table-dark">
+                        <thead>
+                            <tr>
+                                <th scope="col">Action</th>
+                                <th scope="col">Input</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Change coordinate</td>
+                                <td><kbd>L-click + Drag</kbd> (orthogonal planes) <span class="mx-3"></span> <kbd>Scroll Wheel</kbd> (axial slice)</td>
+                            </tr>
+                            <tr>
+                                <td>Point (show cursor to peers)</td>
+                                <td><kbd>Ctrl + L-click +/- Drag</kbd></td>
+                            </tr>
+                            <tr>
+                                <td>Adjust brightness/contrast</td>
+                                <td><kbd>R-click + Drag</kbd></td>
+                            </tr>
+                            <tr>
+                                <td>Zoom</td>
+                                <td><kbd>Ctrl + R-click + Drag</kbd></td>
+                            </tr>
+                            <tr>
+                                <td>Pan (while zoomed)</td>
+                                <td><kbd>Shift + Ctrl + R-click + Drag</kbd></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <script src="papaya.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="rtcpacs-test.js"></script>
+        <script>
+            $('#instructionsLink').popover({
+                trigger: 'hover',
+                placement: 'left',
+                html: true,
+                content: $('#instructions'),
+                container: 'body'
+            });
+        </script>
+    </body>
+</html>
