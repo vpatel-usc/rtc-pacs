@@ -2,7 +2,7 @@
 'use strict';
 
 class RtcPacs {
-    static DEBUG = false;
+    static DEBUG = true;
     static adjectives = [
         'Agile', 'Brilliant', 'Candid', 'Daring', 'Eager',
         'Faithful', 'Gentle', 'Hungry', 'Ignorant', 'Jealous',
