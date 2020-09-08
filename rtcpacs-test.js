@@ -2,7 +2,7 @@
 'use strict';
 
 class RtcPacs {
-    static DEBUG = true;
+    static DEBUG = false;
     static adjectives = [
         'Agile', 'Brilliant', 'Candid', 'Daring', 'Eager',
         'Faithful', 'Gentle', 'Hungry', 'Ignorant', 'Jealous',
@@ -487,12 +487,12 @@ var vm = new Vue({
         testScroll: function() {
             for (let c = 0; c < 10; c++) {
                 for (let i = 0; i <= 34; i++) {
-                    this.viewerState[2] = i;
+                    papayaContainers[0].viewer.currentCoord.z = i;
                     papayaContainers[0].viewer.drawViewer(true);
                     this.$data.broadcastViewer();
                 }
                 for (let i = 33; i >= 1; i--) {
-                    this.viewerState[2] = i;
+                    papayaContainers[0].viewer.currentCoord.z = i;
                     papayaContainers[0].viewer.drawViewer(true);
                     this.$data.broadcastViewer();
                 }
