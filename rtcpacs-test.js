@@ -84,6 +84,12 @@ class RtcPacs {
             RtcPacs.handleError(err);
             RtcPacs.handleError('Microphone permission denied.  This is not going to work.  Look for an icon in the URL bar, grant mic access and reload the page.');
         });
+        
+        // Vars for testing
+        this.t1 = 0;
+        this.t2 = 0;
+        this.t3 = 0;
+        this.t4 = 0;
     }
 
     // Peer Event Listeners
@@ -405,6 +411,16 @@ class RtcPacs {
         // return(newSdp);
         return(sdp);
     }
+
+    testScrollF(ts) {
+        if (this.t1 < N*5) {
+                papayaContainers[0].viewer.currentCoord.z = this.t1 % N;
+                papayaContainers[0].viewer.drawViewer(true);
+                this.$data.broadcastViewer();
+                this.t1++;
+                window.requestAnimationFrame(this.testScrollF.bind(this));
+        }
+    }
 }
 
 let rtcpacs = new RtcPacs();
@@ -485,21 +501,9 @@ var vm = new Vue({
             }
         },
         testScroll: function() {
-            for (let c = 0; c < 1; c++) {
-                for (let z = 0; z <= 34; z++) {
-                    papayaContainers[0].viewer.currentCoord.z = z;
-                    papayaContainers[0].viewer.drawViewer(true);
-                    this.$data.broadcastViewer();
-                }
-                for (let z = 33; z >= 1; z--) {
-                    papayaContainers[0].viewer.currentCoord.z = z;
-                    papayaContainers[0].viewer.drawViewer(true);
-                    this.$data.broadcastViewer();
-                }
-            }
+            window.requestAnimationFrame(this.$data.testScrollF);
         },
         testJump: function() {
-
         }
     },
     watch: {
