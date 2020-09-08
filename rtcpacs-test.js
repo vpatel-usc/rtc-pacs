@@ -502,7 +502,7 @@ var vm = new Vue({
             }
         },
         testScroll: function() {
-            window.requestAnimationFrame(this.$data.testScrollF.bind(this));
+            this.$data.testScrollF();
         },
         testJump: function() {
         }
