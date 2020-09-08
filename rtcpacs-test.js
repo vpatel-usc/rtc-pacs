@@ -431,7 +431,7 @@ class RtcPacs {
                 papayaContainers[0].viewer.drawViewer(true);
                 this.broadcastViewer();
                 this.t2 += m;
-                window.setTimeout(this.testScrollF.bind(this), 500);
+                window.setTimeout(this.testJumpF.bind(this), 500);
         } else {
             this.t2 = 0;
         }
