@@ -485,14 +485,14 @@ var vm = new Vue({
             }
         },
         testScroll: function() {
-            for (let c = 0; c < 10; c++) {
-                for (let i = 0; i <= 34; i++) {
-                    papayaContainers[0].viewer.currentCoord.z = i;
+            for (let c = 0; c < 1; c++) {
+                for (let z = 0; z <= 34; z++) {
+                    papayaContainers[0].viewer.currentCoord.z = z;
                     papayaContainers[0].viewer.drawViewer(true);
                     this.$data.broadcastViewer();
                 }
-                for (let i = 33; i >= 1; i--) {
-                    papayaContainers[0].viewer.currentCoord.z = i;
+                for (let z = 33; z >= 1; z--) {
+                    papayaContainers[0].viewer.currentCoord.z = z;
                     papayaContainers[0].viewer.drawViewer(true);
                     this.$data.broadcastViewer();
                 }
