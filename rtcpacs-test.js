@@ -488,15 +488,13 @@ var vm = new Vue({
             for (let c = 0; c < 10; c++) {
                 for (let i = 0; i <= 34; i++) {
                     this.viewerState[2] = i;
-                    this.updateZoomTransforms();
                     papayaContainers[0].viewer.drawViewer(true);
-                    this.broadcastViewer();
+                    this.$data.broadcastViewer();
                 }
                 for (let i = 33; i >= 1; i--) {
                     this.viewerState[2] = i;
-                    this.updateZoomTransforms();
                     papayaContainers[0].viewer.drawViewer(true);
-                    this.broadcastViewer();
+                    this.$data.broadcastViewer();
                 }
             }
         },
