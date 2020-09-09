@@ -23,6 +23,7 @@ while True:
         stats.append(line)
         time.sleep(0.25)
     except KeyboardInterrupt:
-        for stat in stats:
-            print(stat)
+        with open('output.csv', 'w') as f:
+            for stat in stats:
+                f.write(','.join(stat) + '\n')
         sys.exit()
